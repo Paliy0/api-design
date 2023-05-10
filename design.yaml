@@ -1,0 +1,621 @@
+---
+openapi: 3.0.0
+info:
+  title: API for managing bank accounts
+  description: This is a part of the Bank API
+  contact:
+    email: 646415@student.inholland.nl
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: https://virtserver.swaggerhub.com/646415/Accounts/1.0.0
+    description: SwaggerHub API Auto Mocking
+security:
+  - bearerAuth: []
+tags:
+  - name: Account
+    description: Operations for accounts
+  - name: Customer
+    description: Operations for Customers
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Gets a JWT token
+      description: Gets a JWT token
+      operationId: login
+      requestBody:
+        description: Auth details
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Login"
+            examples:
+              Login343:
+                $ref: "#/components/examples/Login343"
+              Login344:
+                $ref: "#/components/examples/Login344"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Invalid status value.
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Refreshes a JWT token
+      description: Refreshes a JWT token
+      operationId: refresh
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        "400":
+          description: Invalid status value.
+  /accounts:
+    get:
+      tags:
+        - Account
+      summary: Get a list of all accounts
+      description: Returns a list of all accounts
+      operationId: getAllAccounts
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Account"
+        "400":
+          description: Invalid status value.
+    post:
+      tags:
+        - Account
+      summary: Create a new account as employee
+      description: This can only be done by logged in employee
+      operationId: createAccount
+      requestBody:
+        description: Created Account Object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Account"
+            examples:
+              Account1:
+                $ref: "#/components/examples/Account1"
+              Account2:
+                $ref: "#/components/examples/Account2"
+        required: true
+      responses:
+        "200":
+          description: Account created successfully
+      security: []
+  /accounts/{iban}:
+    get:
+      tags:
+        - Account
+      summary: Get an account by its IBAN
+      description: Returns the account with the given IBAN
+      operationId: getAccountByIban
+      parameters:
+        - name: iban
+          in: path
+          description: IBAN of account to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: NL22INGB1234567890
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+              examples:
+                Account1:
+                  $ref: "#/components/examples/Account1"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+    put:
+      tags:
+        - Account
+      summary: Add/close account as employee
+      description: Update the status of the account with the given IBAN as an employee
+      parameters:
+        - name: iban
+          in: path
+          description: IBAN of account to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            format: NL02ABNA0123456789
+        - name: status
+          in: query
+          description: New status of the account (OPEN or CLOSED)
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: string
+            enum:
+              - OPEN
+              - CLOSED
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+              examples:
+                Account1:
+                  $ref: "#/components/examples/Account1"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+  /accounts/{iban}/limit:
+    put:
+      tags:
+        - Account
+      summary: Configure absolute limit for an account as employee
+      description: Update the absolute limit for the account with the given IBAN as an employee
+      parameters:
+        - name: iban
+          in: path
+          description: IBAN of account to update limit
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+        - name: limit
+          in: query
+          description: New absolute limit for the account
+          required: true
+          style: form
+          explode: true
+          schema:
+            type: number
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /users:
+    get:
+      tags:
+        - User
+      summary: Get a list of all users
+      description: Returns a list of all users
+      operationId: getAllUsers
+      parameters:
+        - name: type
+          in: path
+          description: IBAN of account to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: NL22INGB1234567890
+
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid status value.
+    post:
+      tags:
+        - User
+      summary: register a user
+      description: register a new User
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /customer/{customer_id}:
+    put:
+      tags:
+        - Customer
+      summary: Change Customer data
+      description: Edit Customer
+      parameters:
+        - name: customer_id
+          in: path
+          description: id of cusotmer to update
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "404":
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /customers/{customer_name}:
+    get:
+      tags:
+        - Customer
+      summary: Get an User by its Name
+      description: Returns the User with the given Name
+      operationId: getUserbyName
+      parameters:
+        - name: customer_name
+          in: path
+          description: name of user to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: string
+            example: Max
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+
+  /customers/{customer_id}:
+    get:
+      tags:
+        - Customer
+      summary: Get logged in User
+      description: Returns the User with the given ID
+      operationId: getUserbyID
+      parameters:
+        - name: customer_id
+          in: path
+          description: id of user to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+
+  /transactions:
+    get:
+      tags:
+        - Transaction
+      summary: Retrieve a list of all transactions
+      responses:
+        "200":
+          description: Successful operation
+    post:
+      tags:
+        - Transaction
+      summary: Perform a new transaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Transaction"
+      responses:
+        "201":
+          description: Transaction created
+  /transactions/{transactionId}:
+    get:
+      tags:
+        - Transaction
+      summary: Retrieve a specific transaction by ID (or other parameters)
+      parameters:
+        - name: transactionId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: iban
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: balance
+          in: query
+          required: true
+          schema:
+            type: number
+
+      responses:
+        "200":
+          description: Successful operation
+
+  /transactions/atm/deposit:
+    post:
+      tags:
+        - Transaction
+      summary: Perform a deposit at an ATM
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Transaction"
+      responses:
+        "201":
+          description: Deposit transaction created
+  /transactions/atm/withdrawal:
+    post:
+      tags:
+        - Transaction
+      summary: Perform a withdrawal at an ATM
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Transaction"
+      responses:
+        "201":
+          description: Withdrawal transaction created
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        firstName:
+          type: string
+          description: User first Name
+          example: First
+        lastName:
+          type: string
+          description: User last Name
+          example: Last
+        password:
+          type: string
+          description: User password
+          example: secret123
+        birthDate:
+          type: string
+          description: Date of Birth
+          format: date
+          example: "1997-07-12"
+        streetName:
+          type: string
+          example: Eenhoornstraat
+        houseNumber:
+          type: integer
+          example: 1234
+        zipCode:
+          type: string
+          example: "1973 SH"
+        city:
+          type: string
+          example: IJmuiden
+        country:
+          type: string
+          example: Netherlands
+        accounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Account"
+        role:
+          type: string
+          description: User can be a Customer or Employee(are also Customers)
+          enum:
+            - CUSTOMER
+            - EMPLOYEE
+    Account:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        iban:
+          type: string
+          description: Account IBAN
+          example: NL02ABNA0123456780
+        balance:
+          type: number
+          description: Account balance
+          example: 500
+        accountType:
+          type: string
+          description: Account can be of type Current or Savings
+          enum:
+            - CURRENT
+            - SAVINGS
+        status:
+          type: string
+          description: Account can be opened or closed by employee
+          enum:
+            - OPEN
+            - CLOSED
+        dailyLimit:
+          type: number
+          description: The Limit that can be spend in one day
+        transactionLimit:
+          type: number
+          description: The Limit that can be spend per transaction
+
+    Transaction:
+      type: object
+      properties:
+        transactionId:
+          type: integer
+          format: int64
+        timestamp:
+          type: string
+          format: date-time
+        fromAccountIban:
+          type: string
+        toAccountIban:
+          type: string
+        amount:
+          type: number
+        userId:
+          type: integer
+          format: int64
+
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email of the user
+          example: someone@gmail.com
+        password:
+          type: string
+          description: Password of the user
+          example: somepassword123
+    LoginResponse:
+      type: object
+      properties:
+        auth:
+          type: string
+          description: Auth token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        refresh:
+          type: string
+          description: Refresh token
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZWZyZXNoIjp0cnVlfQ.rAFTvBdjOsiHep9peKniaRRZuxU9iAUatILn9SO7V7o
+    Error:
+      required:
+        - code
+        - message
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  examples:
+    Login343:
+      value:
+        email: erwin.devries@inholland.nl
+        password: BetterNotLetThemSee!
+    Login344:
+      value:
+        email: erwin.devries2@inholland.nl
+        password: BetterNotLetThemSeeThisToo!!!
+    Account1:
+      value:
+        id: 1
+        iban: NL02ABNA0123456789
+        balance: 100
+        accountType: Current
+        status: Open
+    Account2:
+      value:
+        id: 2
+        iban: NL02ABNA2223456789
+        balance: 200
+        accountType: Savings
+        status: Open
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
