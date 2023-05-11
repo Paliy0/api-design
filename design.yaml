@@ -707,16 +707,22 @@ components:
       value:
         id: 1
         iban: NL02ABNA0123456789
-        balance: 100
+        balance: 0
         accountType: Current
         status: Open
+        dailyLimit: 100
+        transactionLimit: 100
+        minimumBalance: 0
     Account2:
       value:
         id: 2
         iban: NL02ABNA2223456789
-        balance: 200
+        balance: 0
         accountType: Savings
         status: Open
+        dailyLimit: 100
+        transactionLimit: 100
+        minimumBalance: 0
   securitySchemes:
     bearerAuth:
       type: http
