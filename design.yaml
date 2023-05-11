@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: API for managing bank accounts
-  description: This is a part of the Bank API
+  title: Bank API
+  description: This is a Bank API that will be later used in a project
   contact:
     email: 646415@student.inholland.nl
   license:
