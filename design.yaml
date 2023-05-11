@@ -221,19 +221,9 @@ paths:
     get:
       tags:
         - User
-      summary: Get a list of all users
+      summary: Get a list of all users (which do not have an account)
       description: Returns a list of all users
       operationId: getAllUsers
-      parameters:
-        - name: type
-          in: path
-          description: IBAN of account to return
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-            example: NL22INGB1234567890
 
       responses:
         "200":
@@ -243,7 +233,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/User"
+                  $ref: "#/components/schemas/UserWithoutAccount"
         "400":
           description: Invalid status value.
     post:
@@ -257,7 +247,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserWithoutAccount"
         "400":
           description: Invalid input
           content:
@@ -489,6 +479,10 @@ components:
           type: string
           description: User last Name
           example: Last
+        email:
+          type: string
+          description: User email
+          example: user@domain.com
         password:
           type: string
           description: User password
@@ -497,19 +491,19 @@ components:
           type: string
           description: Date of Birth
           format: date
-          example: "1997-07-12"
+          example: "01/10/2000"
         streetName:
           type: string
-          example: Eenhoornstraat
+          example: Schoonzichtlaan
         houseNumber:
           type: integer
           example: 1234
         zipCode:
           type: string
-          example: "1973 SH"
+          example: "2015 CV"
         city:
           type: string
-          example: IJmuiden
+          example: Haarlem
         country:
           type: string
           example: Netherlands
@@ -523,6 +517,60 @@ components:
           enum:
             - CUSTOMER
             - EMPLOYEE
+    UserWithoutAccount:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        firstName:
+          type: string
+          description: User first Name
+          example: First
+        lastName:
+          type: string
+          description: User last Name
+          example: Last
+        email:
+          type: string
+          description: User email
+          example: user@domain.com
+        password:
+          type: string
+          description: User password
+          example: secret123
+        birthDate:
+          type: string
+          description: Date of Birth
+          format: date
+          example: "01/10/2000"
+        streetName:
+          type: string
+          example: Schoonzichtlaan
+        houseNumber:
+          type: integer
+          example: 1234
+        zipCode:
+          type: string
+          example: "2015 CV"
+        city:
+          type: string
+          example: Haarlem
+        country:
+          type: string
+          example: Netherlands
+        #accounts:
+        #  type: array
+        #  items:
+        #    $ref: "#/components/schemas/Account"
+        #role:
+        #  type: string
+        #  description: User can be a Customer or Employee(are also Customers)
+        #  enum:
+        #    - CUSTOMER
+        #    - EMPLOYEE
     Account:
       type: object
       properties:
