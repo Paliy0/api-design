@@ -295,7 +295,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserWithoutAccount"
         "400":
           description: Invalid input
           content:
@@ -551,6 +551,12 @@ components:
         country:
           type: string
           example: Netherlands
+        BSN:
+          type: string
+          example: 123456789
+        phoneNumber:
+          type: string
+          example: +31 87654334
         accounts:
           type: array
           items:
@@ -601,6 +607,12 @@ components:
         country:
           type: string
           example: Netherlands
+        BSN:
+          type: string
+          example: 123456789
+        phoneNumber:
+          type: string
+          example: +31 87654334
     Account:
       type: object
       properties:
