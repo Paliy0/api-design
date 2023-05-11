@@ -73,6 +73,28 @@ paths:
       summary: Get a list of all accounts
       description: Returns a list of all accounts
       operationId: getAllAccounts
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: The number of items to skip before starting to return items
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            maximum: 50
+            default: 50
+          description: The maximum numbers of items to return (50 max)
+          required: false
+        - in: query
+          name: type
+          schema:
+            type: string
+            enum: [CURRENT, SAVING]
+          example: CURRENT
       responses:
         "200":
           description: List of accounts
@@ -81,11 +103,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Account"
+                  $ref: "#/components/schemas/AccountResponse"
         "400":
           description: Bad request.
         "401":
           description: No authorization.
+        "403":
+          description: Forbidden.
         "500":
           description: Unexpected error.
     post:
@@ -99,20 +123,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Account"
+              $ref: "#/components/schemas/AccountRequest"
             examples:
-              Account1:
-                $ref: "#/components/examples/Account1"
-              Account2:
-                $ref: "#/components/examples/Account2"
+              Account3:
+                $ref: "#/components/examples/Account3"
         required: true
       responses:
-        "200":
+        "201":
           description: Account created successfully
         "400":
           description: Bad request
         "401":
           description: No authorization.
+        "403":
+          description: Forbidden.
         "500":
           description: Unexpected error.
       security: []
@@ -139,7 +163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Account"
+                $ref: "#/components/schemas/AccountResponse"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
@@ -147,6 +171,58 @@ paths:
           description: Bad request.
         "401":
           description: No authorization.
+        "403":
+          description: Forbidden.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
+  /accounts/findIbanByCustomerName:
+    get:
+      tags:
+        - Account
+      summary: "Get an IBAN based on account name"
+      description: "Returns the IBAN of given account name"
+      operationId: getIbanByName
+      parameters:
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: The number of items to skip before starting to return items
+          required: false
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            maximum: 50
+            default: 50
+          description: The maximum numbers of items to return (50 max)
+          required: false
+        - name: name
+          in: query
+          description: Name of customer
+          required: true
+          schema:
+            type: "string"
+            example: "Joe"
+      responses:
+        "200":
+          description: "Result of selected account"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountFind"
+              examples:
+                Account1:
+                  $ref: "#/components/examples/Account4"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
         "404":
           description: Account not found.
         "500":
@@ -182,90 +258,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Account"
+                $ref: "#/components/schemas/AccountResponse"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
         "400":
           description: Bad request.
+        "403":
+          description: Forbidden.
         "401":
           description: No authorization.
         "404":
           description: Account not found.
         "500":
           description: Unexpected error.
-  /accounts/{iban}/dailyLimit:
-    put:
-      tags:
-        - Account
-      summary: "Configure daily limit for an account as employee"
-      description: "Update the daily limit for the account with the given IBAN as an employee"
-      parameters:
-        - name: "iban"
-          in: "path"
-          description: "IBAN of account to update daily limit"
-          required: true
-          schema:
-            maxLength: 18
-            minLength: 18
-            type: "string"
-        - name: "dailyLimit"
-          in: "query"
-          description: "New daily limit for the account"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "200":
-          description: "Successful operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad request.
-        "401":
-          description: No authorization.
-        "404":
-          description: Account not found.
-        "500":
-          description: Unexpected error.
-  /accounts/{iban}/transferLimit:
-    put:
-      tags:
-        - Account
-      summary: "Configure transfer limit for an account as employee"
-      description: "Update the transfer limit for the account with the given IBAN as an employee"
-      parameters:
-        - name: "iban"
-          in: "path"
-          description: "IBAN of account to update transfer limit"
-          required: true
-          schema:
-            maxLength: 18
-            minLength: 18
-            type: "string"
-        - name: "transferLimit"
-          in: "query"
-          description: "New transfer limit for the account"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "200":
-          description: "Successful operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Account"
-        "400":
-          description: Bad request.
-        "401":
-          description: No authorization.
-        "404":
-          description: Account not found.
-        "500":
-          description: Unexpected error.
+
   /users:
     get:
       tags:
@@ -295,7 +302,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserWithoutAccount"
+                $ref: "#/components/schemas/User"
         "400":
           description: Invalid input
           content:
@@ -308,6 +315,80 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+# this needs to be checked, it was removed from accounts and pasted here
+  /users/{iban}/dailyLimit:
+    put:
+      tags:
+        - User
+      summary: "Configure daily limit for an user as employee"
+      description: "Update the daily limit for the account with the given IBAN as an employee"
+      parameters:
+        - name: "iban"
+          in: "path"
+          description: "IBAN of account to update daily limit"
+          required: true
+          schema:
+            maxLength: 18
+            minLength: 18
+            type: "string"
+        - name: "dailyLimit"
+          in: "query"
+          description: "New daily limit for the account"
+          required: true
+          schema:
+            type: "number"
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
+
+  /users/{iban}/transferLimit:
+    put:
+      tags:
+        - User
+      summary: "Configure transfer limit for an user as employee"
+      description: "Update the transfer limit for the account with the given IBAN as an employee"
+      parameters:
+        - name: "iban"
+          in: "path"
+          description: "IBAN of account to update transfer limit"
+          required: true
+          schema:
+            maxLength: 18
+            minLength: 18
+            type: "string"
+        - name: "transferLimit"
+          in: "query"
+          description: "New transfer limit for the account"
+          required: true
+          schema:
+            type: "number"
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
 
   /customers:
     get:
@@ -551,22 +632,24 @@ components:
         country:
           type: string
           example: Netherlands
-        BSN:
-          type: string
-          example: 123456789
-        phoneNumber:
-          type: string
-          example: +31 87654334
         accounts:
           type: array
           items:
-            $ref: "#/components/schemas/Account"
+            $ref: "#/components/schemas/AccountResponse"
         role:
           type: string
           description: User can be a Customer or Employee(are also Customers)
           enum:
             - CUSTOMER
             - EMPLOYEE
+        dailyLimit:
+          type: number
+          description: The Limit that can be spend in one day
+          example: 100
+        transactionLimit:
+          type: number
+          description: The Limit that can be spend in one transaction
+          example: 100
     UserWithoutAccount:
       type: object
       properties:
@@ -607,13 +690,7 @@ components:
         country:
           type: string
           example: Netherlands
-        BSN:
-          type: string
-          example: 123456789
-        phoneNumber:
-          type: string
-          example: +31 87654334
-    Account:
+    AccountResponse:
       type: object
       properties:
         id:
@@ -641,18 +718,48 @@ components:
           enum:
             - OPEN
             - CLOSED
-        dailyLimit:
-          type: number
-          description: The Limit that can be spend in one day
-          example: 100
-        transactionLimit:
-          type: number
-          description: The Limit that can be spend in one transaction
-          example: 100
-        minimumBalance:
+        absoluteLimit:
           type: number
           description: Minimum balance of account
           example: 0
+    AccountRequest:
+      type: object
+      properties:
+        iban:
+          type: string
+          description: Account IBAN
+          example: NL02ABNA0123456780
+        balance:
+          type: number
+          description: Account balance
+          example: 500
+        accountType:
+          type: string
+          description: Account can be of type Current or Savings
+          enum:
+            - CURRENT
+            - SAVINGS
+        status:
+          type: string
+          description: Account can be opened or closed by employee
+          enum:
+            - OPEN
+            - CLOSED
+        absoluteLimit:
+          type: number
+          description: Minimum balance of account
+          example: 0
+    AccountFind:
+      type: object
+      properties:
+        iban:
+          type: string
+          description: Account IBAN
+          example: NL02ABNA0123456780
+        name:
+          type: string
+          description: Name of customer
+          example: Sasa
 
     Transaction:
       type: object
@@ -722,9 +829,7 @@ components:
         balance: 0
         accountType: Current
         status: Open
-        dailyLimit: 100
-        transactionLimit: 100
-        minimumBalance: 0
+        absoluteLimit: 0
     Account2:
       value:
         id: 2
@@ -732,9 +837,18 @@ components:
         balance: 0
         accountType: Savings
         status: Open
-        dailyLimit: 100
-        transactionLimit: 100
-        minimumBalance: 0
+        absoluteLimit: 0
+    Account3:
+      value:
+        iban: NL02ABNA2553456789
+        balance: 0
+        accountType: Savings
+        status: Open
+        absoluteLimit: 0
+    Account4:
+      value:
+        iban: NL02ABNA2553456733
+        name: Sasa
   securitySchemes:
     bearerAuth:
       type: http
