@@ -213,7 +213,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/AccountFind"
               examples:
-                Account1:
+                Account4:
                   $ref: "#/components/examples/Account4"
         "400":
           description: Bad request.
@@ -279,12 +279,21 @@ paths:
       description: Returns a list of all users wich d not have an account
       operationId: getAllUsers
       parameters:
-        - name: hasAccount
-          in: query
-          description: Filter users based on account ownership
-          required: false
+        - in: query
+          name: skip
+          description: number of records to skip for pagination
           schema:
-            type: boolean
+            type: integer
+            format: int32
+            minimum: 0
+        - in: query
+          name: limit
+          description: maximum number of records to return
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 50
       responses:
         "200":
           description: Successful operation
@@ -795,7 +804,7 @@ components:
         user:
           type: array
           items:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/UserResponse"
     AccountRequest:
       type: object
       properties:
@@ -826,7 +835,7 @@ components:
         user:
           type: array
           items:
-            $ref: "#/components/schemas/User"
+            $ref: "#/components/schemas/UserRequest"
     AccountFind:
       type: object
       properties:
@@ -838,10 +847,6 @@ components:
           type: string
           description: Name of customer
           example: Sasa
-        user:
-          type: array
-          items:
-            $ref: "#/components/schemas/User"
     TransactionResponse:
       type: object
       properties:
