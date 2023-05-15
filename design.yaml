@@ -444,35 +444,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/Error"
 
-  /customers/{customer_name}:
-    get:
-      tags:
-        - Customer
-      summary: Get an User by its Name
-      description: Returns the User with the given Name
-      operationId: getUserbyName
-      parameters:
-        - name: customer_name
-          in: path
-          description: name of user to return
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: string
-            example: Max
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid status value
-        "404":
-          description: Account not found
-
   /customers/{customer_id}:
     get:
       tags:
@@ -848,6 +819,9 @@ components:
         amount:
           type: number
           example: 50
+        description:
+          type: string
+          example: ATM Transaction
         userId:
           type: integer
           format: int64
@@ -864,6 +838,9 @@ components:
         amount:
           type: number
           example: 50
+        description:
+          type: string
+          example: ATM Transaction
     Login:
       type: object
       properties:
