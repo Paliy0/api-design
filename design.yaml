@@ -16,8 +16,6 @@ security:
 tags:
   - name: Account
     description: Operations for Accounts
-  - name: Customer
-    description: Operations for Customers
   - name: User
     description: Operations for Users
   - name: Transaction
@@ -280,6 +278,13 @@ paths:
       summary: Get a list of all users
       description: Returns a list of all users wich d not have an account
       operationId: getAllUsers
+      parameters:
+        - name: hasAccount
+          in: query
+          description: Filter users based on account ownership
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           description: Successful operation
@@ -288,7 +293,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserWithoutAccount"
+                  $ref: "#/components/schemas/UserResponse"
         "400":
           description: Invalid status value.
     post:
@@ -302,7 +307,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserRequest"
         "400":
           description: Invalid input
           content:
@@ -315,7 +320,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-# this needs to be checked, it was removed from accounts and pasted here
+  /users/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get logged in User
+      description: Returns the User with the given ID
+      operationId: getUserbyID
+      parameters:
+        - name: userId
+          in: path
+          description: id of user to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            example: 12
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserResponse"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+  /users/dailyLimit/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get daily limit for User
+      description: Returns the daily limit of a User with the given ID
+      operationId: getUserDailyLimit
+      parameters:
+        - name: userId
+          in: path
+          description: id of user to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            example: 12
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserDLimitResponse"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+
+  /users/transactionLimit/{userId}:
+    get:
+      tags:
+        - User
+      summary: Get transaction limit for User
+      description: Returns the transaction limit of a User with the given ID
+      operationId: getUserTransactionLimit
+      parameters:
+        - name: userId
+          in: path
+          description: id of user to return
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserTLimitResponse"
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+  # this needs to be checked, it was removed from accounts and pasted here
   /users/{iban}/dailyLimit:
     put:
       tags:
@@ -343,7 +433,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserDLimitResponse"
         "400":
           description: Bad request.
         "401":
@@ -380,7 +470,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/UserTLimitResponse"
         "400":
           description: Bad request.
         "401":
@@ -389,89 +479,6 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-
-  /customers:
-    get:
-      tags:
-        - Customer
-      summary: Get a list of all customers
-      description: Returns a list of all customers
-      operationId: getAllCustomers
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid status value.
-
-  /customer/{customer_id}:
-    put:
-      tags:
-        - Customer
-      summary: Change Customer data
-      description: Edit Customer
-      parameters:
-        - name: customer_id
-          in: path
-          description: id of cusotmer to update
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: integer
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-        "404":
-          description: Account not found
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Error"
-
-  /customers/{customer_id}:
-    get:
-      tags:
-        - Customer
-      summary: Get logged in User
-      description: Returns the User with the given ID
-      operationId: getUserbyID
-      parameters:
-        - name: customer_id
-          in: path
-          description: id of user to return
-          required: true
-          style: simple
-          explode: false
-          schema:
-            type: integer
-            example: 1
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Invalid status value
-        "404":
-          description: Account not found
 
   /transactions:
     get:
@@ -555,7 +562,7 @@ paths:
       tags:
         - Transaction
       summary: Get a transaction by ID
-      description: Returns the transaction with the given ID 
+      description: Returns the transaction with the given ID
       parameters:
         - name: transactionId
           in: path
@@ -631,7 +638,7 @@ paths:
 
 components:
   schemas:
-    User:
+    UserResponse:
       type: object
       properties:
         id:
@@ -685,14 +692,14 @@ components:
           type: number
           description: The Limit that can be spend in one transaction
           example: 100
-    UserWithoutAccount:
+        hasAccount:
+          type: boolean
+          description: True if the user has at least one account
+          example: true
+
+    UserRequest:
       type: object
       properties:
-        id:
-          type: integer
-          description: Unique identifier for the account
-          format: int64
-          example: 12
         firstName:
           type: string
           description: User first Name
@@ -725,6 +732,37 @@ components:
         country:
           type: string
           example: Netherlands
+        hasAccount:
+          type: boolean
+          description: True if the user has at least one account
+          example: true
+
+    UserDLimitResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        dailyLimit:
+          type: number
+          description: The Limit that can be spend in one day
+          example: 100
+
+    UserTLimitResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        transactionLimit:
+          type: number
+          description: The Limit that can be spend in one transaction
+          example: 100
+
     AccountResponse:
       type: object
       properties:
@@ -838,7 +876,7 @@ components:
       type: object
       properties:
         fromAccountIban: # does this need to be here?
-          type: string   # can't we get it through code by getting the iban of the account the new transaction is being performed from?
+          type: string # can't we get it through code by getting the iban of the account the new transaction is being performed from?
           example: NL02ABNA0123456780
         toAccountIban:
           type: string
