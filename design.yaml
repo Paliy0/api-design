@@ -671,10 +671,6 @@ components:
         country:
           type: string
           example: Netherlands
-        accounts:
-          type: array
-          items:
-            $ref: "#/components/schemas/AccountResponse"
         role:
           type: string
           description: User can be a Customer or Employee(are also Customers)
@@ -761,6 +757,10 @@ components:
           type: number
           description: Minimum balance of account
           example: 0
+        user:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
     AccountRequest:
       type: object
       properties:
@@ -788,6 +788,10 @@ components:
           type: number
           description: Minimum balance of account
           example: 0
+        user:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
     AccountFind:
       type: object
       properties:
@@ -795,10 +799,14 @@ components:
           type: string
           description: Account IBAN
           example: NL02ABNA0123456780
-        name:
+        name: # not sure what exactly we need
           type: string
           description: Name of customer
           example: Sasa
+        user:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
     TransactionResponse:
       type: object
       properties:
@@ -891,6 +899,8 @@ components:
         accountType: Current
         status: Open
         absoluteLimit: 0
+        user: test
+        # user ?
     Account2:
       value:
         id: 2
@@ -899,6 +909,7 @@ components:
         accountType: Savings
         status: Open
         absoluteLimit: 0
+        user: test
     Account3:
       value:
         iban: NL02ABNA2553456789
@@ -906,6 +917,7 @@ components:
         accountType: Savings
         status: Open
         absoluteLimit: 0
+        user: test
     Account4:
       value:
         iban: NL02ABNA2553456733
