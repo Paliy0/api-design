@@ -9,6 +9,9 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Paliy0/TestAPI/1.0.0
   - url: https://virtserver.swaggerhub.com/646415/Accounts/1.0.0
     description: SwaggerHub API Auto Mocking
 security:
@@ -33,7 +36,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Login"
+              $ref: "#/components/schemas/LoginRequest"
             examples:
               Login343:
                 $ref: "#/components/examples/Login343"
@@ -207,7 +210,7 @@ paths:
             example: "Joe"
       responses:
         "200":
-          description: "Result of selected account"
+          description: "Successful operation"
           content:
             application/json:
               schema:
@@ -276,7 +279,7 @@ paths:
       tags:
         - User
       summary: Get a list of all users
-      description: Returns a list of all users wich d not have an account
+      description: Returns a list of all users wich do not have an account
       operationId: getAllUsers
       parameters:
         - in: query
@@ -696,6 +699,7 @@ components:
           type: string
           description: User can be a Customer or Employee(are also Customers)
           enum:
+            - USER
             - CUSTOMER
             - EMPLOYEE
         dailyLimit:
@@ -877,8 +881,8 @@ components:
     TransactionRequest:
       type: object
       properties:
-        fromAccountIban: # does this need to be here?
-          type: string # can't we get it through code by getting the iban of the account the new transaction is being performed from?
+        fromAccountIban:
+          type: string
           example: NL02ABNA0123456780
         toAccountIban:
           type: string
@@ -889,7 +893,7 @@ components:
         description:
           type: string
           example: ATM Transaction
-    Login:
+    LoginRequest:
       type: object
       properties:
         email:
@@ -943,14 +947,6 @@ components:
         zipCode: 2015CV
         city: Haarlem
         country: Netherlands
-        accounts:
-          id: 1
-          iban: NL02ABNA0123456789
-          balance: 0
-          accountType: Current
-          status: Open
-          absoluteLimit: 0
-
         role: Customer
         dailyLimit: 100
         transactionLimit: 100
@@ -967,8 +963,7 @@ components:
         zipCode: 2015CV
         city: Haarlem
         country: Netherlands
-        accounts: null
-        role: null
+        role: User
         dailyLimit: 100
         transactionLimit: 100
     Account1:
@@ -979,8 +974,20 @@ components:
         accountType: Current
         status: Open
         absoluteLimit: 0
-        user: test
-        # user ?
+        user:
+          id: 12
+          firstName: John
+          lastName: Doe
+          password: secret123
+          birthdate: 01-10-2000
+          streetName: Schoonzichtlaan
+          housenumber: 8
+          zipCode: 2015CV
+          city: Haarlem
+          country: Netherlands
+          role: User
+          dailyLimit: 100
+          transactionLimit: 100
     Account2:
       value:
         id: 2
@@ -997,7 +1004,20 @@ components:
         accountType: Savings
         status: Open
         absoluteLimit: 0
-        user: test
+        user:
+          id: 12
+          firstName: John
+          lastName: Doe
+          password: secret123
+          birthdate: 01-10-2000
+          streetName: Schoonzichtlaan
+          housenumber: 8
+          zipCode: 2015CV
+          city: Haarlem
+          country: Netherlands
+          role: User
+          dailyLimit: 100
+          transactionLimit: 100
     Account4:
       value:
         iban: NL02ABNA2553456733
