@@ -294,6 +294,11 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserResponse"
+              examples:
+                UserWithAccount:
+                  $ref: "#/components/examples/UserWithAccount"
+                UserWithoutAccount:
+                  $ref: "#/components/examples/UserWithoutAccount"
         "400":
           description: Invalid status value.
     post:
@@ -662,7 +667,7 @@ components:
           type: string
           description: Date of Birth
           format: date
-          example: "01/10/2000"
+          example: "01-10-2000"
         streetName:
           type: string
           example: Schoonzichtlaan
@@ -692,10 +697,6 @@ components:
           type: number
           description: The Limit that can be spend in one transaction
           example: 100
-        hasAccount:
-          type: boolean
-          description: True if the user has at least one account
-          example: true
 
     UserRequest:
       type: object
@@ -716,7 +717,7 @@ components:
           type: string
           description: Date of Birth
           format: date
-          example: "01/10/2000"
+          example: "01-10-2000"
         streetName:
           type: string
           example: Schoonzichtlaan
@@ -732,10 +733,6 @@ components:
         country:
           type: string
           example: Netherlands
-        hasAccount:
-          type: boolean
-          description: True if the user has at least one account
-          example: true
 
     UserDLimitResponse:
       type: object
@@ -929,6 +926,46 @@ components:
       value:
         email: erwin.devries2@inholland.nl
         password: BetterNotLetThemSeeThisToo!!!
+    UserWithAccount:
+      value:
+        id: 12
+        firstName: John
+        lastName: Doe
+        password: secret123
+        birthdate: 01-10-2000
+        streetName: Schoonzichtlaan
+        housenumber: 8
+        zipCode: 2015CV
+        city: Haarlem
+        country: Netherlands
+        accounts:
+          id: 1
+          iban: NL02ABNA0123456789
+          balance: 0
+          accountType: Current
+          status: Open
+          absoluteLimit: 0
+
+        role: Customer
+        dailyLimit: 100
+        transactionLimit: 100
+
+    UserWithoutAccount:
+      value:
+        id: 12
+        firstName: John
+        lastName: Doe
+        password: secret123
+        birthdate: 01-10-2000
+        streetName: Schoonzichtlaan
+        housenumber: 8
+        zipCode: 2015CV
+        city: Haarlem
+        country: Netherlands
+        accounts: null
+        role: null
+        dailyLimit: 100
+        transactionLimit: 100
     Account1:
       value:
         id: 1
