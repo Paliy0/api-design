@@ -652,6 +652,46 @@ paths:
           description: Forbidden.
         "500":
           description: Unexpected error.
+          
+  /transactions/getDailyToal/{userId}:
+    get:
+      tags:
+        - Transaction
+      summary: Get a transaction for a user for today to calculate the limit
+      description: Returns the transaction with for the given user on the given date
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return transactions from
+          required: true
+          schema:
+            type: integer
+            example: 6
+        - name: date
+          in: query
+          description: date to return the transactions from
+          required: true
+          schema:
+            type: string
+            format: date
+            example: "01/10/2000"
+      responses:
+        "200":
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponse"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
 
 components:
   schemas:
