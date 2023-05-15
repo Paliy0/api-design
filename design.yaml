@@ -506,89 +506,157 @@ paths:
     get:
       tags:
         - Transaction
-      summary: Retrieve a list of all transactions
+      summary: Get all transactions
+      description: Returns a list of all the transactions
+      parameters:
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: "2023-06-25T09:15:04Z"
+        - name: fromAccountIban
+          in: query
+          required: false
+          schema:
+            type: string
+            example: NL02ABNA0123456780
+        - name: toAccountIban
+          in: query
+          required: false
+          schema:
+            type: string
+            example: NL02ABNA0123456780
+        - name: balanceStart
+          in: query
+          required: false
+          schema:
+            type: number
+            example: 30
+        - name: balanceEnd
+          in: query
+          required: false
+          schema:
+            type: number
+            example: 60
       responses:
         "200":
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponse"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
     post:
       tags:
         - Transaction
       summary: Perform a new transaction
+      description: Perform a new transaction between two accounts
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Transaction"
+              $ref: "#/components/schemas/TransactionRequest"
       responses:
         "201":
-          description: Transaction created
+          description: Transaction created successfully
+        "400":
+          description: Bad request
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
   /transactions/{transactionId}:
     get:
       tags:
         - Transaction
-      summary: Retrieve a specific transaction by ID (or other parameters)
+      summary: Get a transaction by ID
+      description: Returns the transaction with the given ID 
       parameters:
         - name: transactionId
           in: path
+          description: ID of transaction to return
           required: true
           schema:
             type: integer
-        - name: startDate
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date-time
-        - name: endDate
-          in: query
-          required: true
-          schema:
-            type: string
-            format: date-time
-        - name: iban
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: balance
-          in: query
-          required: true
-          schema:
-            type: number
-
+            example: 6
       responses:
         "200":
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponse"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
 
   /transactions/atm/deposit:
     post:
       tags:
         - Transaction
       summary: Perform a deposit at an ATM
+      description: Perform a deposit at an ATM
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Transaction"
+              $ref: "#/components/schemas/TransactionRequest"
       responses:
         "201":
-          description: Deposit transaction created
+          description: Deposit transaction created successfully
+        "400":
+          description: Bad request
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
   /transactions/atm/withdrawal:
     post:
       tags:
         - Transaction
       summary: Perform a withdrawal at an ATM
+      description: Perform a withdrawal at an ATM
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Transaction"
+              $ref: "#/components/schemas/TransactionRequest"
       responses:
         "201":
-          description: Withdrawal transaction created
+          description: Withdrawal transaction created successfully
+        "400":
+          description: Bad request
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "500":
+          description: Unexpected error.
 
 components:
   schemas:
@@ -760,26 +828,42 @@ components:
           type: string
           description: Name of customer
           example: Sasa
-
-    Transaction:
+    TransactionResponse:
       type: object
       properties:
         transactionId:
           type: integer
           format: int64
+          example: 6
         timestamp:
           type: string
           format: date-time
+          example: "2023-06-25T09:15:04Z"
         fromAccountIban:
           type: string
+          example: NL02ABNA0123456780
         toAccountIban:
           type: string
+          example: NL02ABNA0123456789
         amount:
           type: number
+          example: 50
         userId:
           type: integer
           format: int64
-
+          example: 12
+    TransactionRequest:
+      type: object
+      properties:
+        fromAccountIban: # does this need to be here?
+          type: string   # can't we get it through code by getting the iban of the account the new transaction is being performed from?
+          example: NL02ABNA0123456780
+        toAccountIban:
+          type: string
+          example: NL02ABNA0123456789
+        amount:
+          type: number
+          example: 50
     Login:
       type: object
       properties:
