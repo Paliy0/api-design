@@ -653,7 +653,7 @@ paths:
         "500":
           description: Unexpected error.
           
-  /transactions/getDailyToal/{userId}:
+  /transactions/getDailyTotal/{userId}:
     get:
       tags:
         - Transaction
