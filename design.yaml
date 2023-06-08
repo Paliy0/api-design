@@ -272,7 +272,50 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-
+  
+  /accounts/{iban}/absoluteLimit:
+    put:
+      tags:
+        - Account
+      summary: "Change absolute limit for account as employee"
+      description: "Update the absolute limit of the account with the given IBAN as an employee"
+      parameters:
+        - name: "iban"
+          in: "path"
+          description: "IBAN of account to update"
+          required: true
+          schema:
+            maxLength: 18
+            minLength: 18
+            type: "string"
+            format: "NL02ABNA0123456789"
+        - name: "absolute limit"
+          in: "query"
+          description: "New account absolute limit"
+          required: true
+          schema:
+            type: "number"
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountResponse"
+              examples:
+                Account1:
+                  $ref: "#/components/examples/Account1"
+        "400":
+          description: Bad request.
+        "403":
+          description: Forbidden.
+        "401":
+          description: No authorization.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
+          
   /users:
     get:
       tags:
