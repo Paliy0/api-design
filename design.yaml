@@ -87,7 +87,7 @@ paths:
           schema:
             type: integer
             maximum: 50
-            default: 50
+            default: 10
           description: The maximum numbers of items to return (50 max)
           required: false
         - in: query
@@ -161,6 +161,41 @@ paths:
       responses:
         "200":
           description: "Result of selected account"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccountResponse"
+              examples:
+                Account1:
+                  $ref: "#/components/examples/Account1"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "403":
+          description: Forbidden.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
+  /accounts/MyAccounts/{userId}:
+    get:
+      tags:
+        - Account
+      summary: "Get accounts for logged in user"
+      description: "Returns the accounts with the given user ID"
+      operationId: getMyAccounts
+      parameters:
+        - name: userId
+          in: path
+          description: User ID of account holder
+          required: true
+          schema:
+            type: "string"
+            example: "Joe"
+      responses:
+        "200":
+          description: "Result of selected accounts"
           content:
             application/json:
               schema:
