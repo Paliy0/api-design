@@ -10,6 +10,9 @@ info:
   version: 1.0.0
 servers:
   # Added by API Auto Mocking Plugin
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/684123_1/Bank/1.0.0
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/Paliy0/TestAPI/1.0.0
   - url: https://virtserver.swaggerhub.com/646415/Accounts/1.0.0
@@ -375,6 +378,12 @@ paths:
             format: int32
             minimum: 0
             maximum: 50
+        - in: query
+          name: hasAccount
+          description: specify if the users you want to retrieve have an account or no
+          schema:
+            type: boolean
+
       responses:
         "200":
           description: Successful operation
@@ -383,7 +392,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/UserResponse"
+                  $ref: "#/components/schemas/UserResponseDTO"
               examples:
                 UserWithAccount:
                   $ref: "#/components/examples/UserWithAccount"
@@ -396,13 +405,22 @@ paths:
         - User
       summary: register a user
       description: register a new User
+      operationId: registerUser
+
+      requestBody:
+        description: Data for User object to register
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequestDTO"
+        required: true
       responses:
         "200":
           description: Successful operation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserRequest"
+                $ref: "#/components/schemas/UserRequestDTO"
         "400":
           description: Invalid input
           content:
@@ -415,6 +433,46 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+  /users/updateInformation/{userId}:              
+    put:
+      tags:
+        - User
+      summary: "update information of a user"
+      description: "employees can update every users information and users can update their own personal information"
+      operationId: updateUserById
+
+      parameters:
+        - name: "userId"
+          in: "path"
+          description: "Id of user to update"
+          required: true
+          schema:
+            maxLength: 18
+            minLength: 18
+            type: "number"
+      requestBody:
+        description: Info for Updated User object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserRequestDTO"
+        required: true
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
+            
   /users/{userId}:
     get:
       tags:
@@ -438,12 +496,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserResponse"
+                $ref: "#/components/schemas/UserResponseDTO"
         "400":
           description: Invalid status value
         "404":
           description: Account not found
-  /users/dailyLimit/{userId}:
+    delete:
+      tags: 
+        - User
+      summary: delete User
+      description: deletes the User with the given id
+      operationId: deleteUserById
+      parameters:
+        - name: userId
+          in: path
+          description: id of user to delete
+          required: true
+          style: simple
+          explode: false
+          schema:
+            type: integer
+            example: 12
+      responses:
+        "200":
+          description: Successful operation
+        "400":
+          description: Invalid status value
+        "404":
+          description: Account not found
+  /users/{userId}/dailyLimit:
     get:
       tags:
         - User
@@ -466,13 +547,48 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserDLimitResponse"
+                $ref: "#/components/schemas/UserDLimitDTO"
         "400":
           description: Invalid status value
         "404":
           description: Account not found
+    put:
+      tags:
+        - User
+      summary: "Configure daily limit for an user as employee"
+      description: "Update the daily limit for the user with the given id as an employee"
+      parameters:
+        - name: "userId"
+          in: "path"
+          description: "Id of user to update daily limit"
+          required: true
+          schema:
+            maxLength: 18
+            minLength: 18
+            type: "number"
+        - name: "dailyLimit"
+          in: "query"
+          description: "New daily limit for the user"
+          required: true
+          schema:
+            type: "number"
+      responses:
+        "200":
+          description: "Successful operation"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Bad request.
+        "401":
+          description: No authorization.
+        "404":
+          description: Account not found.
+        "500":
+          description: Unexpected error.
 
-  /users/transactionLimit/{userId}:
+  /users/{userId}/transactionLimit:
     get:
       tags:
         - User
@@ -495,67 +611,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserTLimitResponse"
+                $ref: "#/components/schemas/UserTLimitDTO"
         "400":
           description: Invalid status value
         "404":
           description: Account not found
-  # this needs to be checked, it was removed from accounts and pasted here
-  /users/{iban}/dailyLimit:
-    put:
-      tags:
-        - User
-      summary: "Configure daily limit for an user as employee"
-      description: "Update the daily limit for the account with the given IBAN as an employee"
-      parameters:
-        - name: "iban"
-          in: "path"
-          description: "IBAN of account to update daily limit"
-          required: true
-          schema:
-            maxLength: 18
-            minLength: 18
-            type: "string"
-        - name: "dailyLimit"
-          in: "query"
-          description: "New daily limit for the account"
-          required: true
-          schema:
-            type: "number"
-      responses:
-        "200":
-          description: "Successful operation"
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserDLimitResponse"
-        "400":
-          description: Bad request.
-        "401":
-          description: No authorization.
-        "404":
-          description: Account not found.
-        "500":
-          description: Unexpected error.
-
-  /users/{iban}/transferLimit:
     put:
       tags:
         - User
       summary: "Configure transfer limit for an user as employee"
-      description: "Update the transfer limit for the account with the given IBAN as an employee"
+      description: "Update the transfer limit for the user with the given id as an employee"
       parameters:
-        - name: "iban"
+        - name: "userId"
           in: "path"
-          description: "IBAN of account to update transfer limit"
+          description: "Id of user to update transfer limit"
           required: true
           schema:
             maxLength: 18
             minLength: 18
-            type: "string"
+            type: "number"
         - name: "transferLimit"
           in: "query"
-          description: "New transfer limit for the account"
+          description: "New transfer limit for the user"
           required: true
           schema:
             type: "number"
@@ -565,7 +642,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserTLimitResponse"
+                $ref: "#/components/schemas/User"
         "400":
           description: Bad request.
         "401":
@@ -773,7 +850,7 @@ paths:
 
 components:
   schemas:
-    UserResponse:
+    User:
       type: object
       properties:
         id:
@@ -789,10 +866,22 @@ components:
           type: string
           description: User last Name
           example: Last
+        email:
+          type: string
+          description: User email for login
+          example: user@test.com
         password:
           type: string
           description: User password
           example: secret123
+        phoneNumber:
+          type: string
+          description: User phonenumber
+          example: +311575389403
+        bsn:
+          type: string
+          description: User bsn number
+          example: 123456789
         birthDate:
           type: string
           description: Date of Birth
@@ -813,13 +902,6 @@ components:
         country:
           type: string
           example: Netherlands
-        role:
-          type: string
-          description: User can be a Customer or Employee(are also Customers)
-          enum:
-            - USER
-            - CUSTOMER
-            - EMPLOYEE
         dailyLimit:
           type: number
           description: The Limit that can be spend in one day
@@ -828,8 +910,79 @@ components:
           type: number
           description: The Limit that can be spend in one transaction
           example: 100
+        role:
+          type: string
+          description: User can be a Customer or Employee(are also Customers)
+          enum:
+            - USER
+            - CUSTOMER
+            - EMPLOYEE
 
-    UserRequest:
+    UserResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
+        firstName:
+          type: string
+          description: User first Name
+          example: First
+        lastName:
+          type: string
+          description: User last Name
+          example: Last
+        email:
+          type: string
+          description: User email for login
+          example: user@test.com
+        phoneNumber:
+          type: string
+          description: User phonenumber
+          example: +311575389403
+        bsn:
+          type: string
+          description: User bsn number
+          example: 123456789
+        birthDate:
+          type: string
+          description: Date of Birth
+          format: date
+          example: "01-10-2000"
+        streetName:
+          type: string
+          example: Schoonzichtlaan
+        houseNumber:
+          type: integer
+          example: 1234
+        zipCode:
+          type: string
+          example: "2015 CV"
+        city:
+          type: string
+          example: Haarlem
+        country:
+          type: string
+          example: Netherlands
+        dailyLimit:
+          type: number
+          description: The Limit that can be spend in one day
+          example: 100
+        transactionLimit:
+          type: number
+          description: The Limit that can be spend in one transaction
+          example: 100
+        role:
+          type: string
+          description: User can be a Customer or Employee(are also Customers)
+          enum:
+            - USER
+            - CUSTOMER
+            - EMPLOYEE
+
+    UserRequestDTO:
       type: object
       properties:
         firstName:
@@ -840,10 +993,22 @@ components:
           type: string
           description: User last Name
           example: Last
+        email:
+          type: string
+          description: User email for login
+          example: user@test.com
         password:
           type: string
           description: User password
           example: secret123
+        phoneNumber:
+          type: string
+          description: User phonenumber
+          example: +311575389403
+        bsn:
+          type: string
+          description: User bsn number
+          example: 123456789
         birthDate:
           type: string
           description: Date of Birth
@@ -865,7 +1030,7 @@ components:
           type: string
           example: Netherlands
 
-    UserDLimitResponse:
+    UserDLimitDTO:
       type: object
       properties:
         id:
@@ -878,7 +1043,7 @@ components:
           description: The Limit that can be spend in one day
           example: 100
 
-    UserTLimitResponse:
+    UserTLimitDTO:
       type: object
       properties:
         id:
@@ -926,7 +1091,7 @@ components:
         user:
           type: array
           items:
-            $ref: "#/components/schemas/UserResponse"
+            $ref: "#/components/schemas/UserResponseDTO"
     AccountRequest:
       type: object
       properties:
@@ -957,7 +1122,7 @@ components:
         user:
           type: array
           items:
-            $ref: "#/components/schemas/UserRequest"
+            $ref: "#/components/schemas/UserRequestDTO"
     AccountFind:
       type: object
       properties:
@@ -1058,7 +1223,10 @@ components:
         id: 12
         firstName: John
         lastName: Doe
-        password: secret123
+        email: john@doe.com
+        password: Secret123!
+        phoneNumber: "+3123456789"
+        bsn: "12345678"
         birthdate: 01-10-2000
         streetName: Schoonzichtlaan
         housenumber: 8
@@ -1074,7 +1242,10 @@ components:
         id: 12
         firstName: John
         lastName: Doe
-        password: secret123
+        email: john@doe.com
+        password: Secret123!
+        phoneNumber: "+3123456789"
+        bsn: "12345678"
         birthdate: 01-10-2000
         streetName: Schoonzichtlaan
         housenumber: 8
@@ -1096,7 +1267,10 @@ components:
           id: 12
           firstName: John
           lastName: Doe
-          password: secret123
+          email: john@doe.com
+          password: Secret123!
+          phoneNumber: "+3123456789"
+          bsn: "12345678"
           birthdate: 01-10-2000
           streetName: Schoonzichtlaan
           housenumber: 8
@@ -1126,7 +1300,10 @@ components:
           id: 12
           firstName: John
           lastName: Doe
-          password: secret123
+          email: john@doe.com
+          password: Secret123!
+          phoneNumber: "+3123456789"
+          bsn: "12345678"
           birthdate: 01-10-2000
           streetName: Schoonzichtlaan
           housenumber: 8
