@@ -43,8 +43,6 @@ paths:
             examples:
               Login343:
                 $ref: "#/components/examples/Login343"
-              Login344:
-                $ref: "#/components/examples/Login344"
       responses:
         "200":
           description: Successful operation
@@ -54,22 +52,7 @@ paths:
                 $ref: "#/components/schemas/LoginResponse"
         "400":
           description: Invalid status value.
-  /auth/refresh:
-    post:
-      tags:
-        - Auth
-      summary: Refreshes a JWT token
-      description: Refreshes a JWT token
-      operationId: refresh
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginResponse"
-        "400":
-          description: Invalid status value.
+
   /accounts:
     get:
       tags:
@@ -107,7 +90,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/AccountResponse"
+                  $ref: "#/components/schemas/AccountResponseDTO"
         "400":
           description: Bad request.
         "401":
@@ -127,7 +110,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/AccountRequest"
+              $ref: "#/components/schemas/AccountRequestDTO"
             examples:
               Account3:
                 $ref: "#/components/examples/Account3"
@@ -167,7 +150,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountResponse"
+                $ref: "#/components/schemas/AccountResponseDTO"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
@@ -202,7 +185,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountResponse"
+                $ref: "#/components/schemas/MyAccountResponseDTO"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
@@ -252,7 +235,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountFind"
+                $ref: "#/components/schemas/FindAccountResponseDTO"
               examples:
                 Account4:
                   $ref: "#/components/examples/Account4"
@@ -297,7 +280,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountResponse"
+                $ref: "#/components/schemas/AccountResponseDTO"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
@@ -311,7 +294,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-  
+
   /accounts/{iban}/absoluteLimit:
     put:
       tags:
@@ -340,7 +323,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccountResponse"
+                $ref: "#/components/schemas/AccountResponseDTO"
               examples:
                 Account1:
                   $ref: "#/components/examples/Account1"
@@ -354,7 +337,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-          
+
   /users:
     get:
       tags:
@@ -433,7 +416,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/updateInformation/{userId}:              
+  /users/updateInformation/{userId}:
     put:
       tags:
         - User
@@ -472,7 +455,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-            
+
   /users/{userId}:
     get:
       tags:
@@ -502,7 +485,7 @@ paths:
         "404":
           description: Account not found
     delete:
-      tags: 
+      tags:
         - User
       summary: delete User
       description: deletes the User with the given id
@@ -518,8 +501,8 @@ paths:
             type: integer
             example: 12
       responses:
-        "200":
-          description: Successful operation
+        "204":
+          description: No Content
         "400":
           description: Invalid status value
         "404":
@@ -807,7 +790,7 @@ paths:
           description: Forbidden.
         "500":
           description: Unexpected error.
-          
+
   /transactions/getDailyTotal/{userId}:
     get:
       tags:
@@ -1056,7 +1039,7 @@ components:
           description: The Limit that can be spend in one transaction
           example: 100
 
-    AccountResponse:
+    AccountResponseDTO:
       type: object
       properties:
         id:
@@ -1072,6 +1055,13 @@ components:
           type: number
           description: Account balance
           example: 500
+        absoluteLimit:
+          type: number
+          description: Account absolute limit
+          example: 0
+        createdAt:
+          type: string
+          description: Timestamp of account creation
         accountType:
           type: string
           description: Account can be of type Current or Savings
@@ -1084,17 +1074,19 @@ components:
           enum:
             - OPEN
             - CLOSED
-        absoluteLimit:
-          type: number
-          description: Minimum balance of account
-          example: 0
         user:
           type: array
           items:
             $ref: "#/components/schemas/UserResponseDTO"
-    AccountRequest:
+
+    MyAccountResponseDTO:
       type: object
       properties:
+        id:
+          type: integer
+          description: Unique identifier for the account
+          format: int64
+          example: 12
         iban:
           type: string
           description: Account IBAN
@@ -1103,6 +1095,13 @@ components:
           type: number
           description: Account balance
           example: 500
+        absoluteLimit:
+          type: number
+          description: Account absolute limit
+          example: 0
+        createdAt:
+          type: string
+          description: Timestamp of account creation
         accountType:
           type: string
           description: Account can be of type Current or Savings
@@ -1115,25 +1114,47 @@ components:
           enum:
             - OPEN
             - CLOSED
-        absoluteLimit:
+        totalBalance:
           type: number
-          description: Minimum balance of account
-          example: 0
-        user:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserRequestDTO"
-    AccountFind:
+          description: Total balance of all accounts
+          example: 5000
+
+    FindAccountResponseDTO:
       type: object
       properties:
         iban:
           type: string
           description: Account IBAN
           example: NL02ABNA0123456780
-        name: # not sure what exactly we need
+        name: 
           type: string
           description: Name of customer
           example: Sasa
+        accountType:
+          type: string
+          description: Type of account
+          example: CURRENT
+
+    AccountRequestDTO:
+      type: object
+      properties:
+        accountType:
+          type: string
+          description: Account can be of type Current or Savings
+          enum:
+            - CURRENT
+            - SAVINGS
+        accountStatus:
+          type: string
+          description: Account can be opened or closed by employee
+          enum:
+            - ACTIVE 
+            - INACTIVE
+        accountHolder:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponseDTO"
+
     TransactionResponse:
       type: object
       properties:
@@ -1212,12 +1233,8 @@ components:
   examples:
     Login343:
       value:
-        email: erwin.devries@inholland.nl
-        password: BetterNotLetThemSee!
-    Login344:
-      value:
-        email: erwin.devries2@inholland.nl
-        password: BetterNotLetThemSeeThisToo!!!
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZWZyZXNoIjp0cnVlfQ.rAFTvBdjOsiHep9peKniaRRZuxU9iAUatILn9SO7V7o
+        id: 2
     UserWithAccount:
       value:
         id: 12
