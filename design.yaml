@@ -43,8 +43,6 @@ paths:
             examples:
               Login343:
                 $ref: "#/components/examples/Login343"
-              Login344:
-                $ref: "#/components/examples/Login344"
       responses:
         "200":
           description: Successful operation
@@ -54,22 +52,7 @@ paths:
                 $ref: "#/components/schemas/LoginResponse"
         "400":
           description: Invalid status value.
-  /auth/refresh:
-    post:
-      tags:
-        - Auth
-      summary: Refreshes a JWT token
-      description: Refreshes a JWT token
-      operationId: refresh
-      responses:
-        "200":
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LoginResponse"
-        "400":
-          description: Invalid status value.
+
   /accounts:
     get:
       tags:
@@ -311,7 +294,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-  
+
   /accounts/{iban}/absoluteLimit:
     put:
       tags:
@@ -354,7 +337,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-          
+
   /users:
     get:
       tags:
@@ -433,7 +416,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /users/updateInformation/{userId}:              
+  /users/updateInformation/{userId}:
     put:
       tags:
         - User
@@ -472,7 +455,7 @@ paths:
           description: Account not found.
         "500":
           description: Unexpected error.
-            
+
   /users/{userId}:
     get:
       tags:
@@ -502,7 +485,7 @@ paths:
         "404":
           description: Account not found
     delete:
-      tags: 
+      tags:
         - User
       summary: delete User
       description: deletes the User with the given id
@@ -518,8 +501,8 @@ paths:
             type: integer
             example: 12
       responses:
-        "200":
-          description: Successful operation
+        "204":
+          description: No Content
         "400":
           description: Invalid status value
         "404":
@@ -807,7 +790,7 @@ paths:
           description: Forbidden.
         "500":
           description: Unexpected error.
-          
+
   /transactions/getDailyTotal/{userId}:
     get:
       tags:
@@ -1212,12 +1195,8 @@ components:
   examples:
     Login343:
       value:
-        email: erwin.devries@inholland.nl
-        password: BetterNotLetThemSee!
-    Login344:
-      value:
-        email: erwin.devries2@inholland.nl
-        password: BetterNotLetThemSeeThisToo!!!
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZWZyZXNoIjp0cnVlfQ.rAFTvBdjOsiHep9peKniaRRZuxU9iAUatILn9SO7V7o
+        id: 2
     UserWithAccount:
       value:
         id: 12
