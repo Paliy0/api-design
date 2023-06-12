@@ -1126,7 +1126,7 @@ components:
           type: string
           description: Account IBAN
           example: NL02ABNA0123456780
-        name: 
+        name:
           type: string
           description: Name of customer
           example: Sasa
@@ -1148,7 +1148,7 @@ components:
           type: string
           description: Account can be opened or closed by employee
           enum:
-            - ACTIVE 
+            - ACTIVE
             - INACTIVE
         accountHolder:
           type: array
@@ -1208,18 +1208,18 @@ components:
           type: string
           description: Password of the user
           example: somepassword123
-    LoginResponse:
+    TokenDTO:
       type: object
       properties:
-        auth:
+        token:
           type: string
           description: Auth token
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
-        refresh:
-          type: string
-          description: Refresh token
-          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZWZyZXNoIjp0cnVlfQ.rAFTvBdjOsiHep9peKniaRRZuxU9iAUatILn9SO7V7o
-    Error:
+        userId:
+          type: integer
+          description: Id of the user
+          example: 1
+    ExceptionDTO:
       required:
         - code
         - message
@@ -1228,6 +1228,8 @@ components:
         code:
           type: integer
           format: int32
+        name:
+          type: string
         message:
           type: string
   examples:
